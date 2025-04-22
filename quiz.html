@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Which Country Matches Your Personality?</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 700px; margin: auto; }
+    h1, h2 { color: #ff6600; }
+    input, button { margin: 10px 0; padding: 10px; width: 100%; border-radius: 8px; border: 1px solid #ccc; }
+    #error { color: red; display: none; }
+  </style>
+</head>
+<body>
+
+  <h1>Which Country Matches Your Personality?</h1>
+
+  <form id="quiz-form" action="https://formsubmit.co/madjyboy1@gmail.com" method="POST">
+    <label for="email">Enter your email:</label>
+    <input type="email" name="email" id="email" required>
+
+    <div id="quiz"></div>
+
+    <input type="hidden" name="country_result" id="country_result">
+    <input type="hidden" name="_redirect" id="redirect" value="">
+
+    <div id="error">Please answer all questions and enter a valid email.</div>
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+  </form>
+
+  <script>
+    const questions = [
+      {
+        question: "What best describes your daily vibe?",
+        answers: [
+          { text: "Calm and focused", country: "Japan" },
+          { text: "Lively and social", country: "Brazil" },
+          { text: "Bold and confident", country: "USA" },
+          { text: "Quiet and deep", country: "Iceland" },
+          { text: "Elegant and thoughtful", country: "France" }
+        ]
+      },
+      {
+        question: "What’s your favorite way to relax?",
+        answers: [
+          { text: "Watch anime or meditate", country: "Japan" },
+          { text: "Go dancing or meet friends", country: "Brazil" },
+          { text: "Hit the gym or hustle", country: "USA" },
+          { text: "Walk in nature or read", country: "Iceland" },
+          { text: "Sip coffee and journal", country: "France" }
+        ]
+      },
+      {
+        question: "Pick a travel destination:",
+        answers: [
+          { text: "Tokyo", country: "Japan" },
+          { text: "Rio de Janeiro", country: "Brazil" },
+          { text: "New York", country: "USA" },
+          { text: "Reykjavik", country: "Iceland" },
+          { text: "Paris", country: "France" }
+        ]
+      },
+      {
+        question: "Your dream house is...",
+        answers: [
+          { text: "Minimalist apartment", country: "Japan" },
+          { text: "Beach house with music", country: "Brazil" },
+          { text: "Big modern home", country: "USA" },
+          { text: "Cabin in the mountains", country: "Iceland" },
+          { text: "Charming townhouse", country: "France" }
+        ]
+      },
+      {
+        question: "Choose a motto:",
+        answers: [
+          { text: "Discipline over everything", country: "Japan" },
+          { text: "Life is a party", country: "Brazil" },
+          { text: "Dream big, work hard", country: "USA" },
+          { text: "Peace in silence", country: "Iceland" },
+          { text: "Beauty in simplicity", country: "France" }
+        ]
+      }
+    ];
+
+    const scores = {};
+    const allCountries = ["Japan", "Brazil", "USA", "Iceland", "France", "Italy", "Germany", "Mexico", "Canada", "South Korea"];
+    allCountries.forEach(c => scores[c] = 0);
+
+    function addQuestions() {
+      const container = document.getElementById("quiz");
+      questions.forEach((q, i) => {
+        const title = document.createElement("h2");
+        title.innerText = q.question;
+        container.appendChild(title);
+
+        q.answers.forEach(a => {
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "q" + i;
+          radio.value = a.country;
+          container.appendChild(radio);
+
+          const label = document.createElement("label");
+          label.innerText = " " + a.text;
+          container.appendChild(label);
+          container.appendChild(document.createElement("br"));
+        });
+      });
+    }
+
+    function submitQuiz() {
+      const email = document.getElementById("email").value.trim();
+      if (!email.includes("@") || !email.includes(".")) {
+        document.getElementById("error").style.display = "block";
+        return;
+      }
+
+      const form = document.forms[0];
+      const formData = new FormData(form);
+      const selectedAnswers = [];
+
+      for (let i = 0; i < questions.length; i++) {
+        const answer = formData.get("q" + i);
+        if (!answer) {
+          document.getElementById("error").style.display = "block";
+          return;
+        }
+        selectedAnswers.push(answer);
+        scores[answer]++;
+      }
+
+      const topScore = Math.max(...Object.values(scores));
+      const topCountries = Object.entries(scores).filter(([k, v]) => v === topScore).map(([k]) => k);
+      const result = topCountries[Math.floor(Math.random() * topCountries.length)];
+
+      document.getElementById("country_result").value = result;
+      document.getElementById("redirect").value = "thankyou.html?result=" + encodeURIComponent(result);
+
+      document.getElementById("error").style.display = "none";
+      form.submit();
+    }
+
+    addQuestions();
+  </script>
+
+</body>
+</html>
